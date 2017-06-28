@@ -8,14 +8,13 @@
                 <div class="panel-body">
                     <ul class="chat" id="chat">
                         <li class="left clearfix" v-for="message in messages">
-                        <span class="chat-img pull-left">
-                        <img src="http://placehold.it/50/55C1E7/fff&amp;text=U" alt="User Avatar" class="img-circle">
-                        </span>
-                            <div class="chat-body clearfix">
+
+                            <div class="chat-body clearfix" style="position:relative;">
                                 <div class="header">
                                     <strong class="primary-font"> {{message.name}}</strong>
                                 </div>
                                 <p>{{message.message}} </p>
+                                <span v-if="message.user_id != userid" v-on:click="report(message)" style="cursor:pointer;position:absolute;top:0px;font-size:10px;right:10px;"><i class="glyphicon glyphicon-alert"></i> Reporter</span>
                             </div>
                         </li>
                     </ul>
@@ -41,25 +40,39 @@
             };
         },
         props: {
+            userid: {type: Number, required:true},
             name: {type: String, required: true},
             sendername: {type: String, required: true},
-            receiverid: {type: Number, required: true}
+            receiverid: {type: Number, required: true},
+            gameid: {type:Number,required:true},
+            past_messages: {type:Array, required:false}
         },
         created(){
+
+            if (this.past_messages != undefined) {
+                this.messages = this.past_messages;
+            }
+
             window.Echo.channel('chat-message'+window.userid)
                 .listen('ChatMessage', (e) => {
+                    if (e.user.gameid !== this.gameid) {
+                        return;
+                    }
                     this.messages.push({
+                        id: e.user.id,
                         name: e.user.name,
-                        message: e.user.message
+                        message: e.user.message,
+                        user_id: e.user.user_id
                     })
                 });
         },
         methods: {
             sendMessage(){
-                this.messages.push({"message" : this.message , "name" : this.sendername});
+                this.messages.push({"message" : this.message , "name" : this.sendername, "user_id": this.userid});
                 window.axios.post('/chat',{
                     receiverid : this.receiverid,
-                    message : this.message
+                    message : this.message,
+                    gameid: this.gameid
                 }).then(response => {
                     this.chatMessage = "";
                 }, response => {
@@ -68,6 +81,18 @@
                     console.log(response);
                 });
                 this.message = '';
+            },
+            report: function(message){
+                window.axios.post('/report',{
+                    messageid : message.id,
+                    userid : message.user_id
+                }).then(response => {
+                    alert('Thanks for reporting.');
+                }, response => {
+                    this.error = 1;
+                    console.log("error");
+                    console.log(response);
+                });
             }
         }
     }

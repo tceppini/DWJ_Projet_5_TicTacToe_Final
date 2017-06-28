@@ -159,7 +159,7 @@
                 <a id="exit-button" href="/home" class="btn btn-lg btn-primary" style="display: none">Exit Game</a>
             </div>
             <div class="col-md-6">
-                <chat sendername="{{ $user->name  }}" name="{{ $otherPlayer->name  }}" :receiverid={{ $otherPlayerId  }}></chat>
+                <chat :userid={{Auth::user()->id}} :past_messages="{{$messages}}" :gameid={{$id}} sendername="{{ $user->name  }}" name="{{ $otherPlayer->name  }}" :receiverid={{ $otherPlayerId  }}></chat>
             </div>
         </div>
     </div>
