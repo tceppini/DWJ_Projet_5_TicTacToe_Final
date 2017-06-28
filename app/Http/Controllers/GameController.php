@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use App\Events\GameOver;
 use App\Events\Play;
 use App\Game;
+use App\Report;
 use App\Turn;
 use App\User;
 use Illuminate\Http\Request;
@@ -78,14 +79,33 @@ class GameController extends Controller
 			],
 		];
 
+		$_messages = Game::where('id', '=', $id)->first()->messages()->get();
+		$messages = [];
+
+		foreach ($_messages as $message) {
+		    $_message = $message->toArray();
+		    $_message['name'] = $_message['user_id'] == Auth::user()->id ? Auth::user()->name : $otherPlayer->name;
+		    $messages[] = $_message;
+        }
+        $messages = json_encode($messages);
 
 		foreach($pastTurns as $pastTurn){
 			$locations[$pastTurn->location]["checked"] = true;
 			$locations[$pastTurn->location]["type"] = $pastTurn->type;
 		}
 
-		return view('board', compact('user', 'otherPlayer', 'id', 'nextTurn', 'locations', 'playerType', 'otherPlayerId'));
+		return view('board', compact('user', 'otherPlayer', 'messages', 'id', 'nextTurn', 'locations', 'playerType', 'otherPlayerId'));
 	}
+
+    public function report(Request $request)
+    {
+        $report = new Report();
+        $report->message_id = $request->messageid;
+        $report->user_id = $request->userid;
+        $report->save();
+
+        return "true";
+    }
 
 	public function play(Request $request, $id)
 	{

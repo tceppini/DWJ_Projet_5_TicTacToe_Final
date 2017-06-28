@@ -18,7 +18,8 @@ class Controller extends BaseController
 
     protected $_countries = [
         'US' => 'United States',
-        'FR' => 'France'
+        'FR' => 'France',
+        'BE' => 'Belgique'
     ];
 
     public function __construct()

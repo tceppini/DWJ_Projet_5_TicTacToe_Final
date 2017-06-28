@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Message;
 use Illuminate\Http\Request;
 use App\User;
 use Auth;
@@ -26,13 +27,22 @@ class ChatController extends Controller
      */
     public function sendMessage(Request $request)
     {
-        $message = [
+        $event = [
             "id" => $request->receiverid,
             "sourceuserid" => Auth::user()->id,
             "name" => Auth::user()->name,
-            "message" => $request->message
+            "message" => $request->message,
+            "gameid" => $request->gameid,
+            "user_id" => Auth::user()->id
         ];
-        event(new ChatMessage($message));
+
+        $message = new Message();
+        $message->message = $request->message;
+        $message->user_id = Auth::user()->id;
+        $message->game_id = $request->gameid;
+        $message->save();
+
+        event(new ChatMessage($event));
         return "true";
     }
 

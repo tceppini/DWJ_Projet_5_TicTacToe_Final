@@ -27,4 +27,9 @@ class Game extends Model
     {
         return $this->belongsTo(User::class, 'second_player_id');
     }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class, 'game_id');
+    }
 }
