@@ -18,6 +18,7 @@ Route::post('/game-over/{id}', 'GameController@gameOver');
 Route::post('/new-game', 'HomeController@newGame');
 
 Route::post('/chat','ChatController@sendMessage');
+Route::post('/report','GameController@report');
 Route::get('/chat','ChatController@chatPage');
 
 Route::group([
@@ -33,5 +34,6 @@ Route::group([
     });
     Route::get('users', 'UsersController@index');
     Route::get('ban/{id}', 'UsersController@ban')->where('id', '[0-9]+');
+    Route::get('ignore-report/{id}', 'UsersController@ignoreReport')->where('id', '[0-9]+');
     Route::get('unban/{id}', 'UsersController@unban')->where('id', '[0-9]+');
 });
